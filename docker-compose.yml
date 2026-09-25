@@ -1,0 +1,229 @@
+# Kalshi Trading System - Docker Compose Configuration
+#
+# Usage:
+#   Development: docker-compose --profile dev up
+#   Production:  docker-compose --profile prod up
+#   Tests only:  docker-compose run test
+#
+version: "3.8"
+
+services:
+  # ==================================================
+  # Production Trading System (Paper Mode)
+  # ==================================================
+  trading-paper:
+    build:
+      context: .
+      target: production
+    container_name: kalshi-trading-paper
+    profiles: ["prod", "paper"]
+    restart: unless-stopped
+    environment:
+      - KALSHI_API_KEY=${KALSHI_API_KEY:-}
+      - KALSHI_API_SECRET=${KALSHI_API_SECRET:-}
+      - KALSHI_PAPER_TRADING=true
+      - KALSHI_MIN_EDGE=0.05
+      - KALSHI_SCAN_INTERVAL=300
+      - DATABASE_URL=sqlite:///data/kalshi.db
+      - LOG_LEVEL=INFO
+    volumes:
+      - trading-data:/app/data
+      - trading-logs:/app/logs
+    networks:
+      - kalshi-network
+    command: ["python", "-m", "src.main", "--paper"]
+
+  # ==================================================
+  # Production Trading System (Live Mode)
+  # ==================================================
+  trading-live:
+    build:
+      context: .
+      target: production
+    container_name: kalshi-trading-live
+    profiles: ["live"]
+    restart: unless-stopped
+    environment:
+      - KALSHI_API_KEY=${KALSHI_API_KEY}
+      - KALSHI_API_SECRET=${KALSHI_API_SECRET}
+      - KALSHI_PAPER_TRADING=false
+      - KALSHI_MIN_EDGE=0.08
+      - KALSHI_SCAN_INTERVAL=300
+      - KALSHI_MAX_DAILY_LOSS=100
+      - DATABASE_URL=sqlite:///data/kalshi.db
+      - LOG_LEVEL=INFO
+      - ALERT_WEBHOOK_URL=${ALERT_WEBHOOK_URL:-}
+    volumes:
+      - trading-data:/app/data
+      - trading-logs:/app/logs
+    networks:
+      - kalshi-network
+    command: ["python", "-m", "src.main", "--live"]
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  # ==================================================
+  # Development Environment
+  # ==================================================
+  dev:
+    build:
+      context: .
+      target: development
+    container_name: kalshi-dev
+    profiles: ["dev"]
+    environment:
+      - KALSHI_ENV=development
+      - KALSHI_PAPER_TRADING=true
+      - DATABASE_URL=sqlite:///data/kalshi_dev.db
+      - LOG_LEVEL=DEBUG
+    volumes:
+      - .:/app
+      - dev-data:/app/data
+    networks:
+      - kalshi-network
+    stdin_open: true
+    tty: true
+    command: ["bash"]
+
+  # ==================================================
+  # Test Runner
+  # ==================================================
+  test:
+    build:
+      context: .
+      target: development
+    container_name: kalshi-test
+    profiles: ["test"]
+    environment:
+      - KALSHI_ENV=test
+      - DATABASE_URL=sqlite:///data/kalshi_test.db
+      - LOG_LEVEL=DEBUG
+    volumes:
+      - .:/app
+    networks:
+      - kalshi-network
+    command: ["python", "-m", "pytest", "tests/", "-v", "--tb=short"]
+
+  # ==================================================
+  # Linting and Type Checking
+  # ==================================================
+  lint:
+    build:
+      context: .
+      target: development
+    container_name: kalshi-lint
+    profiles: ["lint"]
+    volumes:
+      - .:/app
+    networks:
+      - kalshi-network
+    command: >
+      bash -c "
+        echo '=== Running Black ===' && black --check src/ tests/ &&
+        echo '=== Running isort ===' && isort --check-only src/ tests/ &&
+        echo '=== Running mypy ===' && mypy src/ &&
+        echo '=== All checks passed! ==='
+      "
+
+  # ==================================================
+  # CLI Tools
+  # ==================================================
+  cli:
+    build:
+      context: .
+      target: production
+    container_name: kalshi-cli
+    profiles: ["cli"]
+    environment:
+      - KALSHI_API_KEY=${KALSHI_API_KEY:-}
+      - KALSHI_API_SECRET=${KALSHI_API_SECRET:-}
+      - DATABASE_URL=sqlite:///data/kalshi.db
+    volumes:
+      - trading-data:/app/data
+      - trading-logs:/app/logs
+    networks:
+      - kalshi-network
+    entrypoint: ["python", "-m", "src.cli"]
+    command: ["--help"]
+
+  # ==================================================
+  # Web Dashboard
+  # ==================================================
+  dashboard:
+    build:
+      context: .
+      target: production
+    container_name: kalshi-dashboard
+    profiles: ["dashboard", "prod", "paper"]
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=sqlite:///data/kalshi.db
+      - LOG_LEVEL=INFO
+    volumes:
+      - trading-data:/app/data
+      - trading-logs:/app/logs
+    ports:
+      - "8501:8501"
+    networks:
+      - kalshi-network
+    command: ["streamlit", "run", "src/dashboard/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ==================================================
+  # Backtest Runner
+  # ==================================================
+  backtest:
+    build:
+      context: .
+      target: production
+    container_name: kalshi-backtest
+    profiles: ["backtest"]
+    environment:
+      - DATABASE_URL=sqlite:///data/kalshi.db
+      - LOG_LEVEL=INFO
+    volumes:
+      - trading-data:/app/data
+      - ./reports:/app/reports
+    networks:
+      - kalshi-network
+    command: >
+      python -c "
+        from datetime import datetime, timedelta
+        from src.analysis.backtest import run_backtest, get_backtester
+
+        end = datetime.utcnow()
+        start = end - timedelta(days=30)
+
+        result = run_backtest(start, end)
+        report = get_backtester().generate_report(result)
+        print(report)
+
+        with open('/app/reports/backtest_report.txt', 'w') as f:
+            f.write(report)
+      "
+
+# ==================================================
+# Networks
+# ==================================================
+networks:
+  kalshi-network:
+    driver: bridge
+
+# ==================================================
+# Volumes
+# ==================================================
+volumes:
+  trading-data:
+    driver: local
+  trading-logs:
+    driver: local
+  dev-data:
+    driver: local

@@ -1,0 +1,7 @@
+{
+  "interval": 60,
+  "min_edge": 2,
+  "min_confidence": 60,
+  "max_positions": 20,
+  "auto_execute": true
+}

@@ -1,0 +1,20 @@
+{
+  "bankroll": 1000.00,
+  "mode": "paper",
+  "max_single_bet_pct": 0.05,
+  "max_longshot_exposure": 0.15,
+  "min_position": 3.00,
+  "max_position": 200.00,
+  "sizing": {
+    "high_confidence": {"min_pct": 0.02, "max_pct": 0.04},
+    "medium_confidence": {"min_pct": 0.01, "max_pct": 0.02},
+    "low_confidence": {"min_pct": 0.005, "max_pct": 0.01}
+  },
+  "edge_multipliers": {
+    "1.5_to_2.0": 1.0,
+    "2.0_to_3.0": 1.25,
+    "3.0_to_5.0": 1.5,
+    "5.0_plus": 2.0
+  },
+  "updated_at": "2025-01-28T00:00:00Z"
+}
