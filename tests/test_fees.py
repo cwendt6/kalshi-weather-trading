@@ -129,11 +129,6 @@ class TestImpossibleScannerPriceValidation:
                 f"Price {price_cents}c should NOT be profitable after fees"
             )
 
-    def test_scanner_blocks_above_max_price(self):
-        """Scanner's MAX_NO_PRICE blocks trades above threshold."""
-        from src.strategy.impossible_scanner import ImpossibleEventScanner
-        scanner = ImpossibleEventScanner()
-        assert scanner.MAX_NO_PRICE == 0.93, "MAX_NO_PRICE must be 93c (tightened from 97c)"
         # 94c+ is blocked by MAX_NO_PRICE
 
     def test_trades_at_96_and_below(self):

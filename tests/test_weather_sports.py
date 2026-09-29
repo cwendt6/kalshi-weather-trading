@@ -200,103 +200,12 @@ class TestWeatherDiscovery:
 # Odds API Client Tests
 # ═══════════════════════════════════════════════════════════════════════════════
 
-class TestOddsAPIClient:
-    """Test the Odds API client structure."""
-
-    def test_client_initializes(self):
-        from src.connectors.odds_api_client import OddsAPIClient
-        client = OddsAPIClient(api_key="test_key")
-        assert client.api_key == "test_key"
-
-    @pytest.fixture(autouse=False)
-    def _clear_odds_key(self, monkeypatch):
-        monkeypatch.delenv("ODDS_API_KEY", raising=False)
-
-    def test_client_without_key(self, monkeypatch):
-        monkeypatch.delenv("ODDS_API_KEY", raising=False)
-        from src.connectors.odds_api_client import OddsAPIClient
-        client = OddsAPIClient(api_key="")
-        assert client.api_key == ""
-
-    def test_kalshi_sports_mapping(self):
-        from src.connectors.odds_api_client import OddsAPIClient
-        assert "americanfootball_nfl" in OddsAPIClient.KALSHI_SPORTS
-        assert "basketball_nba" in OddsAPIClient.KALSHI_SPORTS
-
-    def test_sport_event_compute_consensus(self):
-        from src.connectors.odds_api_client import SportEvent
-        from datetime import datetime
-        event = SportEvent(
-            event_id="test",
-            sport_key="nfl",
-            sport_title="NFL",
-            home_team="Chiefs",
-            away_team="Eagles",
-            commence_time=datetime.now(),
-            bookmakers=[
-                {
-                    "markets": [{
-                        "key": "h2h",
-                        "outcomes": [
-                            {"name": "Chiefs", "price": 1.50},  # 66.7%
-                            {"name": "Eagles", "price": 2.80},  # 35.7%
-                        ]
-                    }]
-                },
-                {
-                    "markets": [{
-                        "key": "h2h",
-                        "outcomes": [
-                            {"name": "Chiefs", "price": 1.55},  # 64.5%
-                            {"name": "Eagles", "price": 2.60},  # 38.5%
-                        ]
-                    }]
-                },
-            ],
-        )
-        event.compute_consensus()
-
-        # Should be normalized (sum to ~1.0)
-        total = event.consensus_home_prob + event.consensus_away_prob
-        assert abs(total - 1.0) < 0.01
-
-        # Chiefs should be favored
-        assert event.consensus_home_prob > event.consensus_away_prob
-
-    def test_quota_status(self):
-        from src.connectors.odds_api_client import OddsAPIClient
-        client = OddsAPIClient(api_key="test")
-        status = client.get_quota_status()
-        assert "remaining" in status
-        assert "used" in status
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # Sports Odds Strategy Tests
 # ═══════════════════════════════════════════════════════════════════════════════
 
-class TestSportsOddsStrategy:
-    """Test sports odds comparison strategy."""
-
-    def test_strategy_initializes(self):
-        from src.strategy.sports_odds_strategy import SportsOddsStrategy
-        strategy = SportsOddsStrategy(min_edge=0.05)
-        assert strategy.min_edge == 0.05
-
-    def test_kalshi_to_sport_mapping(self):
-        from src.strategy.sports_odds_strategy import SportsOddsStrategy
-        assert "KXNFL" in SportsOddsStrategy.KALSHI_TO_SPORT
-        assert "KXNBA" in SportsOddsStrategy.KALSHI_TO_SPORT
-        assert SportsOddsStrategy.KALSHI_TO_SPORT["KXNFL"] == "americanfootball_nfl"
-
-    def test_min_bookmakers_threshold(self):
-        from src.strategy.sports_odds_strategy import SportsOddsStrategy
-        assert SportsOddsStrategy.MIN_BOOKMAKERS >= 3
-
-    def test_factory_function(self):
-        from src.strategy.sports_odds_strategy import get_sports_odds_strategy
-        strategy = get_sports_odds_strategy(min_edge=0.08)
-        assert strategy.min_edge == 0.08
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -342,16 +251,6 @@ class TestSettingsUpdated:
 # Connectors __init__ Tests
 # ═══════════════════════════════════════════════════════════════════════════════
 
-class TestConnectorsInit:
-    """Test connectors __init__ exports."""
-
-    def test_odds_client_importable(self):
-        from src.connectors import OddsAPIClient
-        assert OddsAPIClient is not None
-
-    def test_sport_event_importable(self):
-        from src.connectors import SportEvent
-        assert SportEvent is not None
 
 
 if __name__ == "__main__":

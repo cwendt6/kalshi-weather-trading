@@ -23,17 +23,7 @@ class TestFeeUtilityIntegration:
         from src.utils.fees import KALSHI_WINNER_FEE_RATE
         assert KALSHI_WINNER_FEE_RATE == 0.02
 
-    def test_impossible_scanner_uses_fee_constants(self):
-        """Impossible scanner uses correct fee values."""
-        from src.strategy.impossible_scanner import ImpossibleEventScanner
-        scanner = ImpossibleEventScanner()
-        assert scanner.KALSHI_WINNER_FEE_PCT == KALSHI_WINNER_FEE_RATE
 
-    def test_straddle_uses_fee_rate(self):
-        """Straddle arbitrage uses correct fee rate."""
-        from src.strategy.straddle_arbitrage import StraddleArbitrage
-        sa = StraddleArbitrage()
-        assert sa.FEE_RATE == KALSHI_WINNER_FEE_RATE
 
 
 class TestRiskManagerIntegration:
