@@ -164,7 +164,7 @@ class TestBracketSqueeze:
         """WeatherOpportunity should have trade_type field."""
         from src.strategy.weather_strategy import WeatherOpportunity
         opp = WeatherOpportunity(
-            ticker="KXHIGHNY-26FEB12-T40",
+            ticker="KXHIGHNY-99DEC12-T40",
             city="NYC",
             market_date=date(2026, 2, 12),
             threshold_temp=40,
@@ -183,7 +183,7 @@ class TestBracketSqueeze:
         """WeatherOpportunity can be set to no_exclusion."""
         from src.strategy.weather_strategy import WeatherOpportunity
         opp = WeatherOpportunity(
-            ticker="KXHIGHNY-26FEB12-T55",
+            ticker="KXHIGHNY-99DEC12-T55",
             city="NYC",
             market_date=date(2026, 2, 12),
             threshold_temp=55,
@@ -203,7 +203,7 @@ class TestBracketSqueeze:
         """WeatherOpportunity can be set to yes_convergence."""
         from src.strategy.weather_strategy import WeatherOpportunity
         opp = WeatherOpportunity(
-            ticker="KXHIGHNY-26FEB12-T39",
+            ticker="KXHIGHNY-99DEC12-T39",
             city="NYC",
             market_date=date(2026, 2, 12),
             threshold_temp=39,
@@ -246,7 +246,7 @@ class TestBracketSqueeze:
         from src.strategy.weather_strategy import WeatherStrategy, WeatherOpportunity, WeatherStrategyResult
 
         opp = WeatherOpportunity(
-            ticker="KXHIGHNY-26FEB12-T50",
+            ticker="KXHIGHNY-99DEC12-T50",
             city="NYC",
             market_date=date(2026, 2, 12),
             threshold_temp=50,
@@ -271,7 +271,7 @@ class TestBracketSqueeze:
         # NO probability = 1 - 0.05 = 0.95 > 0.80 → qualifies
         # But edge may be too small; check classification at least
         for o in result.opportunities:
-            if o.ticker == "KXHIGHNY-26FEB12-T50":
+            if o.ticker == "KXHIGHNY-99DEC12-T50":
                 assert o.trade_type == "no_exclusion"
                 assert o.recommendation == "BUY_NO"
 
@@ -281,7 +281,7 @@ class TestBracketSqueeze:
         from src.strategy.weather_strategy import WeatherStrategy, WeatherOpportunity, WeatherStrategyResult
 
         opp = WeatherOpportunity(
-            ticker="KXHIGHNY-26FEB12-T39",
+            ticker="KXHIGHNY-99DEC12-T39",
             city="NYC",
             market_date=date(2026, 2, 12),
             threshold_temp=39,
@@ -303,7 +303,7 @@ class TestBracketSqueeze:
             ws = WeatherStrategy()
             result = ws.scan_bracket_squeeze()
 
-        found = [o for o in result.opportunities if o.ticker == "KXHIGHNY-26FEB12-T39"]
+        found = [o for o in result.opportunities if o.ticker == "KXHIGHNY-99DEC12-T39"]
         assert len(found) == 1
         assert found[0].trade_type == "yes_convergence"
         assert found[0].recommendation == "BUY_YES"
@@ -314,7 +314,7 @@ class TestBracketSqueeze:
         from src.strategy.weather_strategy import WeatherStrategy, WeatherOpportunity, WeatherStrategyResult
 
         opp = WeatherOpportunity(
-            ticker="KXHIGHNY-26FEB12-T42",
+            ticker="KXHIGHNY-99DEC12-T42",
             city="NYC",
             market_date=date(2026, 2, 12),
             threshold_temp=42,
@@ -336,7 +336,7 @@ class TestBracketSqueeze:
             ws = WeatherStrategy()
             result = ws.scan_bracket_squeeze()
 
-        found = [o for o in result.opportunities if o.ticker == "KXHIGHNY-26FEB12-T42"]
+        found = [o for o in result.opportunities if o.ticker == "KXHIGHNY-99DEC12-T42"]
         assert len(found) == 1
         assert found[0].trade_type == "threshold"
 
@@ -378,7 +378,7 @@ class TestBracketSqueeze:
         from src.strategy.weather_strategy import WeatherStrategy, WeatherOpportunity, WeatherStrategyResult
 
         no_opp = WeatherOpportunity(
-            ticker="KXHIGHNY-26FEB12-T55",
+            ticker="KXHIGHNY-99DEC12-T55",
             city="NYC",
             market_date=date(2026, 2, 12),
             threshold_temp=55,
@@ -393,7 +393,7 @@ class TestBracketSqueeze:
             market_type="temperature",
         )
         yes_opp = WeatherOpportunity(
-            ticker="KXHIGHNY-26FEB12-T39",
+            ticker="KXHIGHNY-99DEC12-T39",
             city="NYC",
             market_date=date(2026, 2, 12),
             threshold_temp=39,
@@ -574,7 +574,7 @@ class TestWeatherExitLogic:
         from src.execution.position_reevaluator import PositionReEvaluator
         return PositionReEvaluator(paper_trading=True)
 
-    def _make_pos_data(self, ticker="KXHIGHNY-26FEB12-T40", side="yes",
+    def _make_pos_data(self, ticker="KXHIGHNY-99DEC12-T40", side="yes",
                        quantity=10, entry_price=45, current_price=50,
                        hours_held=2.0):
         """Build a standard pos_data dict for testing."""
@@ -593,20 +593,20 @@ class TestWeatherExitLogic:
     def test_is_weather_position_yes_convergence(self):
         """weather_yes_convergence should be detected as weather position."""
         reeval = self._get_reeval()
-        reeval._strategy_cache["KXHIGHNY-26FEB12-T40"] = "weather_yes_convergence"
-        assert reeval._is_weather_position("KXHIGHNY-26FEB12-T40")
+        reeval._strategy_cache["KXHIGHNY-99DEC12-T40"] = "weather_yes_convergence"
+        assert reeval._is_weather_position("KXHIGHNY-99DEC12-T40")
 
     def test_is_weather_position_no_hold(self):
         """weather_no_hold should be detected as weather position."""
         reeval = self._get_reeval()
-        reeval._strategy_cache["KXHIGHNY-26FEB12-T55"] = "weather_no_hold"
-        assert reeval._is_weather_position("KXHIGHNY-26FEB12-T55")
+        reeval._strategy_cache["KXHIGHNY-99DEC12-T55"] = "weather_no_hold"
+        assert reeval._is_weather_position("KXHIGHNY-99DEC12-T55")
 
     def test_is_weather_position_legacy(self):
         """Legacy 'weather' strategy should be detected as weather position."""
         reeval = self._get_reeval()
-        reeval._strategy_cache["KXHIGHNY-26FEB12-T40"] = "weather"
-        assert reeval._is_weather_position("KXHIGHNY-26FEB12-T40")
+        reeval._strategy_cache["KXHIGHNY-99DEC12-T40"] = "weather"
+        assert reeval._is_weather_position("KXHIGHNY-99DEC12-T40")
 
     def test_is_not_weather_position(self):
         """Non-weather strategies should NOT be weather positions."""
@@ -626,7 +626,7 @@ class TestWeatherExitLogic:
         """YES convergence: should force exit after 12 hours."""
         from src.execution.position_reevaluator import ExitReason
         reeval = self._get_reeval()
-        reeval._strategy_cache["KXHIGHNY-26FEB12-T40"] = "weather_yes_convergence"
+        reeval._strategy_cache["KXHIGHNY-99DEC12-T40"] = "weather_yes_convergence"
 
         pos = self._make_pos_data(hours_held=13.0)
         decision = reeval._evaluate_weather_position(pos)
@@ -639,7 +639,7 @@ class TestWeatherExitLogic:
         """YES convergence: edge flipped negative → EXIT."""
         from src.execution.position_reevaluator import ExitReason
         reeval = self._get_reeval()
-        reeval._strategy_cache["KXHIGHNY-26FEB12-T40"] = "weather_yes_convergence"
+        reeval._strategy_cache["KXHIGHNY-99DEC12-T40"] = "weather_yes_convergence"
         mock_edge.return_value = -0.05  # Edge flipped
 
         pos = self._make_pos_data(hours_held=2.0)
@@ -653,7 +653,7 @@ class TestWeatherExitLogic:
         """YES convergence: edge gone (< 2%) → EXIT."""
         from src.execution.position_reevaluator import ExitReason
         reeval = self._get_reeval()
-        reeval._strategy_cache["KXHIGHNY-26FEB12-T40"] = "weather_yes_convergence"
+        reeval._strategy_cache["KXHIGHNY-99DEC12-T40"] = "weather_yes_convergence"
         mock_edge.return_value = 0.01  # Edge nearly zero
 
         pos = self._make_pos_data(hours_held=2.0)
@@ -667,7 +667,7 @@ class TestWeatherExitLogic:
         """YES convergence: +5c profit → take profit tier 1 (25%)."""
         from src.execution.position_reevaluator import ExitReason
         reeval = self._get_reeval()
-        reeval._strategy_cache["KXHIGHNY-26FEB12-T40"] = "weather_yes_convergence"
+        reeval._strategy_cache["KXHIGHNY-99DEC12-T40"] = "weather_yes_convergence"
         mock_edge.return_value = 0.08  # Still has edge (so no edge-based exit)
 
         pos = self._make_pos_data(
@@ -686,8 +686,8 @@ class TestWeatherExitLogic:
         """YES convergence: +10c profit → take profit tier 2 (50%)."""
         from src.execution.position_reevaluator import ExitReason
         reeval = self._get_reeval()
-        reeval._strategy_cache["KXHIGHNY-26FEB12-T40"] = "weather_yes_convergence"
-        reeval._partial_exits["KXHIGHNY-26FEB12-T40"] = 0  # No prior exits
+        reeval._strategy_cache["KXHIGHNY-99DEC12-T40"] = "weather_yes_convergence"
+        reeval._partial_exits["KXHIGHNY-99DEC12-T40"] = 0  # No prior exits
         mock_edge.return_value = 0.08
 
         pos = self._make_pos_data(
@@ -704,7 +704,7 @@ class TestWeatherExitLogic:
         """YES convergence: +15c profit → full exit."""
         from src.execution.position_reevaluator import ExitReason
         reeval = self._get_reeval()
-        reeval._strategy_cache["KXHIGHNY-26FEB12-T40"] = "weather_yes_convergence"
+        reeval._strategy_cache["KXHIGHNY-99DEC12-T40"] = "weather_yes_convergence"
         mock_edge.return_value = 0.08
 
         pos = self._make_pos_data(
@@ -725,7 +725,7 @@ class TestWeatherExitLogic:
         """YES convergence: 30%+ drop from peak in afternoon → full exit."""
         from src.execution.position_reevaluator import ExitReason
         reeval = self._get_reeval()
-        reeval._strategy_cache["KXHIGHNY-26FEB12-T40"] = "weather_yes_convergence"
+        reeval._strategy_cache["KXHIGHNY-99DEC12-T40"] = "weather_yes_convergence"
         mock_edge.return_value = 0.05  # Edge not flipped/gone
         mock_city.return_value = "NYC"
         mock_peak.return_value = 70  # Peak was 70c
@@ -749,7 +749,7 @@ class TestWeatherExitLogic:
         """YES convergence: 30%+ drop from peak in morning + no edge → reduce 50%."""
         from src.execution.position_reevaluator import ExitReason
         reeval = self._get_reeval()
-        reeval._strategy_cache["KXHIGHNY-26FEB12-T40"] = "weather_yes_convergence"
+        reeval._strategy_cache["KXHIGHNY-99DEC12-T40"] = "weather_yes_convergence"
         # First call returns enough edge to pass edge checks, second (in hard drop) returns None
         mock_edge.side_effect = [0.05, None]
         mock_city.return_value = "NYC"
@@ -769,7 +769,7 @@ class TestWeatherExitLogic:
     def test_yes_hold_with_good_edge(self, mock_edge):
         """YES convergence: good edge + small profit → HOLD."""
         reeval = self._get_reeval()
-        reeval._strategy_cache["KXHIGHNY-26FEB12-T40"] = "weather_yes_convergence"
+        reeval._strategy_cache["KXHIGHNY-99DEC12-T40"] = "weather_yes_convergence"
         mock_edge.return_value = 0.08  # Good edge
 
         pos = self._make_pos_data(
@@ -786,7 +786,7 @@ class TestWeatherExitLogic:
     def test_no_hold_default_hold(self, mock_edge):
         """NO hold: should hold by default when forecast unchanged."""
         reeval = self._get_reeval()
-        reeval._strategy_cache["KXHIGHNY-26FEB12-T55"] = "weather_no_hold"
+        reeval._strategy_cache["KXHIGHNY-99DEC12-T55"] = "weather_no_hold"
         mock_edge.return_value = 0.05
 
         # Mock the forecast check to return a forecast far from bracket
@@ -801,7 +801,7 @@ class TestWeatherExitLogic:
             mock_ws.return_value = mock_strategy
 
             pos = self._make_pos_data(
-                ticker="KXHIGHNY-26FEB12-T55", side="no",
+                ticker="KXHIGHNY-99DEC12-T55", side="no",
                 entry_price=85, current_price=87,  # Below 90c threshold
                 hours_held=10.0, quantity=50,
             )
@@ -815,7 +815,7 @@ class TestWeatherExitLogic:
         """NO hold: forecast shifted to within ±2F of bracket → EXIT."""
         from src.execution.position_reevaluator import ExitReason
         reeval = self._get_reeval()
-        reeval._strategy_cache["KXHIGHNY-26FEB12-T40"] = "weather_no_hold"
+        reeval._strategy_cache["KXHIGHNY-99DEC12-T40"] = "weather_no_hold"
 
         with patch("src.strategy.weather_strategy.get_weather_strategy") as mock_ws:
             mock_strategy = Mock()
@@ -829,7 +829,7 @@ class TestWeatherExitLogic:
             mock_ws.return_value = mock_strategy
 
             pos = self._make_pos_data(
-                ticker="KXHIGHNY-26FEB12-T40", side="no",
+                ticker="KXHIGHNY-99DEC12-T40", side="no",
                 entry_price=95, current_price=90,
                 hours_held=6.0, quantity=50,
             )
@@ -844,7 +844,7 @@ class TestWeatherExitLogic:
         """NO hold: forecast shifted partway, edge < 3%, distance ≤ 4F → trim 50%."""
         from src.execution.position_reevaluator import ExitReason
         reeval = self._get_reeval()
-        reeval._strategy_cache["KXHIGHNY-26FEB12-T40"] = "weather_no_hold"
+        reeval._strategy_cache["KXHIGHNY-99DEC12-T40"] = "weather_no_hold"
         mock_edge.return_value = 0.02  # Edge below 3%
 
         with patch("src.strategy.weather_strategy.get_weather_strategy") as mock_ws:
@@ -859,7 +859,7 @@ class TestWeatherExitLogic:
             mock_ws.return_value = mock_strategy
 
             pos = self._make_pos_data(
-                ticker="KXHIGHNY-26FEB12-T40", side="no",
+                ticker="KXHIGHNY-99DEC12-T40", side="no",
                 entry_price=95, current_price=92,
                 hours_held=8.0, quantity=50,
             )
@@ -872,7 +872,7 @@ class TestWeatherExitLogic:
     def test_no_hold_free_capital_at_90c(self):
         """NO hold: NO priced at 90c+ → sell to free capital."""
         reeval = self._get_reeval()
-        reeval._strategy_cache["KXHIGHNY-26FEB12-T55"] = "weather_no_hold"
+        reeval._strategy_cache["KXHIGHNY-99DEC12-T55"] = "weather_no_hold"
 
         with patch("src.strategy.weather_strategy.get_weather_strategy") as mock_ws:
             mock_strategy = Mock()
@@ -885,7 +885,7 @@ class TestWeatherExitLogic:
             mock_ws.return_value = mock_strategy
 
             pos = self._make_pos_data(
-                ticker="KXHIGHNY-26FEB12-T55", side="no",
+                ticker="KXHIGHNY-99DEC12-T55", side="no",
                 entry_price=95, current_price=92,  # 92/100 = 0.92 >= 0.90 threshold
                 hours_held=20.0, quantity=50,
             )
@@ -897,7 +897,7 @@ class TestWeatherExitLogic:
     def test_weather_grace_period_holds(self):
         """Weather positions in grace period should HOLD."""
         reeval = self._get_reeval()
-        reeval._strategy_cache["KXHIGHNY-26FEB12-T40"] = "weather_yes_convergence"
+        reeval._strategy_cache["KXHIGHNY-99DEC12-T40"] = "weather_yes_convergence"
 
         pos = self._make_pos_data(
             hours_held=0.05,  # 3 minutes, below 10 min grace
@@ -911,7 +911,7 @@ class TestWeatherExitLogic:
         """Weather positions: hard stop-loss at -50% should trigger."""
         from src.execution.position_reevaluator import ExitReason
         reeval = self._get_reeval()
-        reeval._strategy_cache["KXHIGHNY-26FEB12-T40"] = "weather_yes_convergence"
+        reeval._strategy_cache["KXHIGHNY-99DEC12-T40"] = "weather_yes_convergence"
 
         pos = self._make_pos_data(
             side="yes", entry_price=50, current_price=24,  # -52% loss
@@ -933,7 +933,7 @@ class TestWeatherExitLogic:
     def test_legacy_weather_treated_as_no_hold(self):
         """Legacy 'weather' strategy should be dispatched to _evaluate_no_hold."""
         reeval = self._get_reeval()
-        reeval._strategy_cache["KXHIGHNY-26FEB12-T55"] = "weather"
+        reeval._strategy_cache["KXHIGHNY-99DEC12-T55"] = "weather"
 
         with patch("src.strategy.weather_strategy.get_weather_strategy") as mock_ws:
             mock_strategy = Mock()
@@ -946,7 +946,7 @@ class TestWeatherExitLogic:
             mock_ws.return_value = mock_strategy
 
             pos = self._make_pos_data(
-                ticker="KXHIGHNY-26FEB12-T55", side="no",
+                ticker="KXHIGHNY-99DEC12-T55", side="no",
                 entry_price=85, current_price=87,  # Below 90c free capital threshold
                 hours_held=10.0, quantity=50,
             )
@@ -961,49 +961,6 @@ class TestWeatherExitLogic:
 # ═══════════════════════════════════════════════════════════════════════════
 
 
-class TestPositionManagerWeatherSkip:
-    """Tests for PositionManager._is_weather_ticker() and weather skip in check_positions()."""
-
-    def test_kxhigh_is_weather(self):
-        """KXHIGHNY-26FEB12-T40 should be detected as weather ticker."""
-        from src.execution.position_manager import PositionManager
-        assert PositionManager._is_weather_ticker("KXHIGHNY-26FEB12-T40")
-
-    def test_kxlowt_is_weather(self):
-        """KXLOWTNYC-26FEB12-B21 should be detected as weather ticker."""
-        from src.execution.position_manager import PositionManager
-        assert PositionManager._is_weather_ticker("KXLOWTNYC-26FEB12-B21")
-
-    def test_kxrain_is_weather(self):
-        """KXRAINNYCM-26FEB-3 should be detected as weather ticker."""
-        from src.execution.position_manager import PositionManager
-        assert PositionManager._is_weather_ticker("KXRAINNYCM-26FEB-3")
-
-    def test_snowm_is_weather(self):
-        """KXBOSSNOWM-26FEB-15.0 should be detected as weather ticker."""
-        from src.execution.position_manager import PositionManager
-        assert PositionManager._is_weather_ticker("KXBOSSNOWM-26FEB-15.0")
-
-    def test_crypto_not_weather(self):
-        """Crypto tickers should NOT be weather."""
-        from src.execution.position_manager import PositionManager
-        assert not PositionManager._is_weather_ticker("KXBTC-26FEB12-T50000")
-
-    def test_sports_not_weather(self):
-        """Sports tickers should NOT be weather."""
-        from src.execution.position_manager import PositionManager
-        assert not PositionManager._is_weather_ticker("KXMVES-NFL-PHI-KC")
-
-    def test_general_market_not_weather(self):
-        """General market tickers should NOT be weather."""
-        from src.execution.position_manager import PositionManager
-        assert not PositionManager._is_weather_ticker("KXNEWPOPE-26FEB")
-
-    def test_case_insensitive(self):
-        """Weather ticker detection should be case-insensitive."""
-        from src.execution.position_manager import PositionManager
-        assert PositionManager._is_weather_ticker("kxhighny-26feb12-t40")
-        assert PositionManager._is_weather_ticker("KxRainNYCm-26FEB-3")
 
 
 # ═══════════════════════════════════════════════════════════════════════════

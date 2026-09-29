@@ -29,9 +29,10 @@ Threshold derivations:
   - HARD_STOP_LOSS = 50%: catastrophic safety net for model failures
 """
 import os
+import re
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from enum import Enum
 from typing import Any, Dict, List, Optional, Set, Tuple
 
@@ -42,6 +43,27 @@ from src.data.models import MarketDB, PositionDB, PriceDB, TradeDB
 from src.utils.fees import KALSHI_WINNER_FEE_RATE
 from src.utils.logging import logger
 
+
+
+_MONTHS = {
+    "JAN": 1, "FEB": 2, "MAR": 3, "APR": 4, "MAY": 5, "JUN": 6,
+    "JUL": 7, "AUG": 8, "SEP": 9, "OCT": 10, "NOV": 11, "DEC": 12,
+}
+
+
+def parse_ticker_date(ticker: str) -> date | None:
+    """Market date from a Kalshi ticker. Format is YYMMMDD: KXHIGHNY-26FEB12-T32 is Feb 12, 2026."""
+    m = re.search(r"-(\d{2})([A-Z]{3})(\d{2})-", ticker)
+    if not m:
+        return None
+    yr_str, mon_str, day_str = m.groups()
+    month = _MONTHS.get(mon_str)
+    if month is None:
+        return None
+    try:
+        return date(2000 + int(yr_str), month, int(day_str))
+    except ValueError:
+        return None
 
 class ExitReason(Enum):
     """Why a position is being exited."""
@@ -546,31 +568,22 @@ class PositionReEvaluator:
         # ── 1b. TICKER DATE CHECK — quick filter for obviously past markets ──
         # Parse date from ticker (e.g., KXHIGHNY-26FEB12-T32 → Feb 12, 2026)
         try:
-            import re
             from datetime import date as _date_type
-            date_match = re.search(r'-(\d{2})([A-Z]{3})(\d{2})-', ticker)
-            if date_match:
-                day_str, mon_str, yr_str = date_match.groups()
-                month_map = {
-                    "JAN": 1, "FEB": 2, "MAR": 3, "APR": 4, "MAY": 5, "JUN": 6,
-                    "JUL": 7, "AUG": 8, "SEP": 9, "OCT": 10, "NOV": 11, "DEC": 12,
-                }
-                month = month_map.get(mon_str)
-                if month:
-                    ticker_date = _date_type(2000 + int(yr_str), month, int(day_str))
-                    if ticker_date < _date_type.today():
-                        logger.debug(
-                            f"[REEVAL] Skipping past-date ticker {ticker} "
-                            f"(date={ticker_date}, today={_date_type.today()})"
-                        )
-                        return ExitDecision(
-                            ticker=ticker, side=side, quantity=quantity,
-                            should_exit=False,
-                            reasoning=(
-                                f"Past-date market ({ticker_date}), "
-                                f"awaiting settlement via API sync"
-                            ),
-                        )
+            ticker_date = parse_ticker_date(ticker)
+            if ticker_date is not None:
+                if ticker_date < _date_type.today():
+                    logger.debug(
+                        f"[REEVAL] Skipping past-date ticker {ticker} "
+                        f"(date={ticker_date}, today={_date_type.today()})"
+                    )
+                    return ExitDecision(
+                        ticker=ticker, side=side, quantity=quantity,
+                        should_exit=False,
+                        reasoning=(
+                            f"Past-date market ({ticker_date}), "
+                            f"awaiting settlement via API sync"
+                        ),
+                    )
         except Exception:
             pass  # If parsing fails, continue with normal evaluation
 
