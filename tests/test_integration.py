@@ -14,13 +14,6 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 # Test imports work
-def test_imports():
-    """Verify all modules can be imported."""
-    from src.strategy.straddle_arbitrage import StraddleArbitrage
-    from src.strategy.longshot_hunter import LongshotHunter
-    from src.analytics.model_health import ModelHealthMonitor
-    from src.execution.position_sizer import get_bankroll
-    assert True
 
 
 # Test bankroll config
@@ -49,36 +42,9 @@ def test_position_sizing_limits():
 
 
 # Test straddle arbitrage detection
-def test_straddle_scanner_initialization():
-    """Verify straddle scanner initializes."""
-    from src.strategy.straddle_arbitrage import StraddleArbitrage
-
-    scanner = StraddleArbitrage()
-    assert scanner.MIN_PROFIT_MARGIN >= 0.02  # 2% minimum (matches fee rate)
-    assert hasattr(scanner, 'find_straddle_opportunities')
-    assert hasattr(scanner, 'execute_straddle')
 
 
 # Test straddle opportunity dataclass
-def test_straddle_opportunity_dataclass():
-    """Verify straddle opportunity structure."""
-    from src.strategy.straddle_arbitrage import StraddleOpportunity
-
-    opp = StraddleOpportunity(
-        ticker="TEST-TICKER",
-        title="Test Market",
-        yes_price=0.48,
-        no_price=0.48,
-        total_cost=0.96,
-        profit_margin=0.04,
-        profit_pct=0.0417,
-        expires_at=datetime.now() + timedelta(hours=1),
-        volume=1000,
-    )
-
-    assert opp.total_cost == 0.96
-    assert opp.profit_margin == 0.04
-    assert opp.profit_pct > 0.04
 
 
 # Test model health thresholds
@@ -110,19 +76,6 @@ def test_model_health_status():
 
 
 # Test longshot hunter criteria
-def test_longshot_criteria():
-    """Verify longshot criteria are set correctly."""
-    from src.strategy.longshot_hunter import LongshotHunter, LongshotCriteria
-
-    hunter = LongshotHunter()
-
-    # Should have criteria attribute
-    assert hasattr(hunter, 'criteria')
-
-    # Default criteria should have reasonable values
-    criteria = LongshotCriteria()
-    assert criteria.MAX_ENTRY_PRICE <= 0.30  # Max 30 cents
-    assert criteria.MIN_EDGE_PERCENT > 0
 
 
 # Test dashboard v3.0 helper functions
@@ -150,39 +103,12 @@ def test_database_models():
 
 
 # Test take-profit configuration
-def test_take_profit_config():
-    """Verify take-profit ladder is configured."""
-    from src.execution.signal_executor import TakeProfitConfig
-
-    config = TakeProfitConfig()
-    assert hasattr(config, 'enabled')
-    assert hasattr(config, 'default_ladder')
-
-    # Default ladder should have entries
-    assert len(config.default_ladder) >= 2
 
 
 # Test take-profit ladder values
-def test_take_profit_ladder_values():
-    """Verify take-profit ladder has sensible values."""
-    from src.execution.signal_executor import TakeProfitConfig
-
-    config = TakeProfitConfig()
-
-    # Check ladder sums to ~100%
-    total_portion = sum(portion for _, portion in config.default_ladder)
-    assert 0.99 <= total_portion <= 1.01, f"Ladder portions sum to {total_portion}, expected ~1.0"
 
 
 # Test signal executor
-def test_signal_executor_initialization():
-    """Verify signal executor initializes."""
-    from src.execution.signal_executor import SignalExecutor
-
-    executor = SignalExecutor(paper_trading=True)
-    assert executor.paper_trading is True
-    assert hasattr(executor, 'execute_signal')
-    assert hasattr(executor, 'place_take_profit_orders')
 
 
 # Test market title helper

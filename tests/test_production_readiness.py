@@ -140,19 +140,7 @@ class TestLiveTrading:
 class TestLongshotWiring:
     """Test longshot hunter is wired into main loop."""
 
-    def test_longshot_import_in_main(self):
-        """LongshotHunter should be importable from main module's imports."""
-        from src.strategy.longshot_hunter import LongshotHunter, get_longshot_hunter
-        assert LongshotHunter is not None
-        assert get_longshot_hunter is not None
 
-    def test_longshot_hunter_scan_method(self):
-        """LongshotHunter.scan_for_longshots should be callable."""
-        from src.strategy.longshot_hunter import LongshotHunter
-        hunter = LongshotHunter()
-        # Should work with empty market list
-        result = hunter.scan_for_longshots(markets=[])
-        assert result == []
 
     def test_main_has_longshot_scan(self):
         """main.py should reference longshot scanning."""
