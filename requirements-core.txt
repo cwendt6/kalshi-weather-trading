@@ -1,51 +1,11 @@
-# Core requirements (lighter weight for initial setup)
-# Full ML dependencies will be installed by RALPH as needed
-
-# Kalshi API
-kalshi-python>=2.1.0
-
-# Data validation & settings
+# Runtime dependencies. pyproject.toml is the source of truth; this mirrors it for pip users.
 pydantic>=2.0.0
 pydantic-settings>=2.0.0
-
-# Database
 sqlalchemy>=2.0.0
 alembic>=1.12.0
-
-# HTTP & async
 httpx>=0.25.0
-aiohttp>=3.9.0
-
-# News & data
-feedparser>=6.0.0
-finnhub-python>=2.4.0
-
-# AI/LLM (Claude API - lightweight)
-anthropic>=0.18.0
-
-# CLI & logging
-typer>=0.9.0
-rich>=13.0.0
+requests>=2.31.0
+cryptography>=41.0.0
 loguru>=0.7.0
-
-# Math & statistics (probability engine)
-# numpy 2.x requires scipy>=1.14 for compatibility
-scipy>=1.14.0
-numpy>=1.24.0
-
-# Utilities
 python-dotenv>=1.0.0
 tenacity>=8.2.0
-schedule>=1.2.0
-
-# Crypto for API signing
-cryptography>=41.0.0
-
-# Dev tools
-pytest>=7.4.0
-pytest-asyncio>=0.21.0
-mypy>=1.7.0
-ruff>=0.1.0
-
-# Note: transformers, torch, vaderSentiment deferred to avoid large downloads
-# RALPH will install these when implementing sentiment analysis (US-011)

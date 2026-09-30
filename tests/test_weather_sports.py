@@ -172,6 +172,10 @@ class TestWeatherTickerParsing:
 # Weather Market Discovery Tests
 # ═══════════════════════════════════════════════════════════════════════════════
 
+@pytest.mark.skipif(
+    not os.path.exists("data/kalshi_trading.db"),
+    reason="needs a local database populated by the discovery script",
+)
 class TestWeatherDiscovery:
     """Test weather market discovery found markets in the database."""
 

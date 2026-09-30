@@ -2,11 +2,20 @@
 
 An autonomous trading system for [Kalshi](https://kalshi.com) weather prediction markets. Uses NWS forecast data, probability modeling, and disciplined risk management to identify and execute positive expected value trades on temperature, rain, and snow markets.
 
+**Status:** not actively traded. Paper mode is the default; live mode needs an explicit flag and confirmation.
+
 ## How It Works
 
 The system runs a continuous loop that scans weather markets every 10 minutes, compares NWS forecasts against market prices, and executes trades where the model finds positive directional edge. Exits are managed by a single deterministic engine (PositionReEvaluator) that monitors edge erosion, forecast shifts, and opportunity cost.
 
 **Core strategy**: Buy NO on temperature brackets far from the NWS forecast (high win rate, reliable income) and selectively buy YES on brackets near the forecast when edge is strong (convergence plays).
+
+## The model
+
+1. **Forecast to probability.** Each temperature market is a bracket or threshold, such as "NYC high above 40°F". The NWS point forecast for the settlement station is the mean of a normal distribution. Its standard deviation depends on forecast lead time and time of day: it narrows as the observation window closes, with a 0.5°F floor. The chance of the bracket settling YES is the area under that curve.
+2. **Edge after fees.** Edge = model probability minus market price, on the side being bought. Kalshi charges 2% of winnings, not of the payout, so fee drag is largest on cheap contracts. Trades must clear an edge floor, and profitability checks include the fee (see `src/utils/fees.py` and `docs/FEE_GUIDE.md`).
+3. **Sizing.** Half-Kelly on the fee-adjusted edge, capped by per-position, per-city and per-event limits. The caps scale with bankroll phase (table below).
+4. **Exits.** A single engine, `PositionReEvaluator`, re-scores every open position each cycle. It exits when the edge erodes, the forecast shifts, or a better use of the capital shows up. Limit sells rest at model EV, with an escalation path for illiquid markets.
 
 ## Prerequisites
 
@@ -17,7 +26,7 @@ The system runs a continuous loop that scans weather markets every 10 minutes, c
 ## Quick Start
 
 ```bash
-# Install dependencies
+# Install (add ,dashboard for the Streamlit dashboard, ,reports for the Excel report)
 pip install -e ".[dev]"
 
 # Copy and configure environment
@@ -122,8 +131,13 @@ All settings loaded from `.env` via pydantic-settings. Key variables:
 ## Testing
 
 ```bash
+pip install -e ".[dev,dashboard]"
 pytest tests/
 ```
+
+Tests need no credentials or network access. `tests/conftest.py` sets throwaway keys and a temp SQLite database. CI runs the suite and a gitleaks secrets scan on every PR.
+
+`tests/known_failures.txt` lists tests that lag behind recent strategy changes. They run as expected failures, so CI still flags any regression in the rest of the suite.
 
 ## Disclaimer
 

@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v3
-      - run: uv venv -p 3.11 && uv pip install -r requirements-core.txt pyyaml respx pytest-timeout
+      - run: uv venv -p 3.11 && uv pip install -e ".[dev,dashboard]"
       - run: uv run --no-project pytest -q --timeout=60 -o addopts=""
   secrets:
     runs-on: ubuntu-latest

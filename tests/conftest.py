@@ -33,8 +33,10 @@ os.environ["LOG_FILE"] = f"{_tmp}/test.log"
 @pytest.fixture(scope="session", autouse=True)
 def _create_tables():
     from src.data.database import init_db
+    from src.monitoring.system_monitor import SystemMonitor
 
     init_db()
+    SystemMonitor.ALERT_LOG_PATH = pathlib.Path(_tmp) / "alerts.json"
 
 
 # Tests that fail on main today, most likely because they lag behind strategy changes.
