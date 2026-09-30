@@ -1,17 +1,9 @@
 # One pytest node id per line. See conftest.py.
 tests/test_critical_fixes.py::TestEdgeDirectionality::test_no_skip_risk_in_codebase
 tests/test_critical_fixes.py::TestWebhookFix::test_webhook_has_detailed_error_logging
-tests/test_dashboard.py::test_dashboard_colors_defined
-tests/test_dashboard.py::test_dashboard_helpers
-tests/test_dashboard.py::test_dashboard_imports
-tests/test_dashboard.py::test_dashboard_pages_exist
-tests/test_dashboard.py::test_dashboard_sidebar
 tests/test_fees.py::TestImpossibleScannerPriceValidation::test_no_trade_at_99_or_above
 tests/test_fees.py::TestIsProfitableAfterFees::test_99_cent_is_not_profitable
 tests/test_fees.py::TestMaxProfitablePrice::test_custom_payout
-tests/test_integration.py::test_dashboard_helpers_v3
-tests/test_integration.py::test_dashboard_v3_tabs
-tests/test_integration.py::test_market_title_helper
 tests/test_integration.py::test_position_sizing_limits
 tests/test_position_reevaluator.py::TestConfiguration::test_default_thresholds
 tests/test_position_reevaluator.py::TestConfiguration::test_fraction_ordering
@@ -56,8 +48,6 @@ tests/test_weather_overhaul.py::TestWeatherExitLogic::test_yes_tp2_at_10c
 tests/test_weather_overhaul.py::TestWeatherExitLogic::test_yes_tp3_full_exit_at_15c
 tests/test_weather_sports.py::TestSettingsUpdated::test_sports_allocation_exists
 tests/test_weather_sports.py::TestSettingsUpdated::test_sports_scan_interval_exists
-tests/test_weather_sports.py::TestWeatherDiscovery::test_settled_weather_markets_exist
-tests/test_weather_sports.py::TestWeatherDiscovery::test_weather_markets_exist_in_db
 tests/test_weather_sports.py::TestWeatherProbability::test_probability_clamped
 tests/unit/test_collector.py::test_collect_markets
 tests/unit/test_collector.py::test_collect_markets_update_existing
